@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "postinstall": "node -e \"require('yt-dlp-exec')\"",
+    "postinstall": "node -e \"require('yt-dlp-exec')('https://www.youtube.com/watch?v=dQw4w9WgXcQ',{dumpSingleJson:true,noWarnings:true}).catch(()=>{})\"",
     "dev": "nodemon server.js"
   },
   "dependencies": {
