@@ -8,7 +8,7 @@ const { randomUUID } = require("crypto");
 
 ffmpeg.setFfmpegPath(ffmpegPath);
 
-const YTDLP_PATH = path.join(__dirname, "node_modules", "yt-dlp-exec", "bin", "yt-dlp.exe");
+const YTDLP_PATH = require("yt-dlp-exec").path || path.join(__dirname, "node_modules", "yt-dlp-exec", "bin", process.platform === "win32" ? "yt-dlp.exe" : "yt-dlp");
 if (!fs.existsSync(YTDLP_PATH)) throw new Error("yt-dlp not found at " + YTDLP_PATH);
 
 function runYtDlp(url, args) {
