@@ -1,78 +1,89 @@
-# 🎵 Audio Finder
+# No Ads Audio Extractor
 
-Extract and stream audio from YouTube videos — right in your browser. **No FFmpeg required!**
+Extract audio from any YouTube video in seconds. Choose your format (MP3, M4A, Opus, WAV, FLAC), pick your bitrate, and download — ad-free, no sign-up required.
+
+**Live:** [no-ads-audio-extracter.onrender.com](https://no-ads-audio-extracter.onrender.com)
 
 ---
 
-## 📁 Folder Structure
+## Features
+
+- Extract audio from any public YouTube video
+- Multiple formats: MP3, M4A, Opus, WAV, FLAC
+- Bitrate control: 96k, 128k, 192k, 320k
+- Batch queue — add multiple URLs, extract all at once
+- Download All as ZIP
+- Thumbnail preview + estimated file size
+- No ads, no sign-up, no tracking
+
+---
+
+## Tech Stack
+
+- **Frontend:** HTML, CSS, Vanilla JS
+- **Backend:** Node.js, Express
+- **Audio:** yt-dlp + ffmpeg (via fluent-ffmpeg)
+- **UI:** Syne + DM Mono fonts, dark theme with neon accent
+
+---
+
+## Prerequisites
+
+- [Node.js](https://nodejs.org) v16 or higher
+- yt-dlp and ffmpeg are auto-installed via npm dependencies
+
+---
+
+## Setup
+
+```bash
+# Clone the repo
+git clone https://github.com/Dharun-Hub-AI/No-Ads-Audio-Extracter.git
+cd No-Ads-Audio-Extracter
+
+# Install dependencies
+npm install
+
+# Start the server
+npm start
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+---
+
+## How It Works
+
+1. Paste a YouTube URL
+2. Select format and bitrate
+3. Click **+ Add** to queue (or press Enter)
+4. Click **Extract All**
+5. Play or download your audio
+
+---
+
+## Project Structure
 
 ```
-audio-finder/
+No-Ads-Audio-Extracter/
 ├── public/
-│   └── index.html        ← Frontend (HTML + CSS + JS)
-├── server.js             ← Express backend
-├── package.json          ← Dependencies
+│   └── index.html          # Frontend
+├── server.js               # Express backend
+├── package.json
+├── render.yaml             # Deployment config
 └── README.md
 ```
 
-> No `downloads/` folder needed anymore — audio streams directly, nothing saved to disk!
+---
+
+## Author
+
+**Dharun-Hub-AI**
+- [GitHub](https://github.com/Dharun-Hub-AI)
+- [LinkedIn](https://www.linkedin.com/in/dharun-4263a8330)
 
 ---
 
-## ⚙️ Prerequisites
+## License
 
-- **Node.js** v16 or higher → https://nodejs.org
-- That's it! No FFmpeg, no other installs.
-
----
-
-## 🚀 Installation & Running
-
-```bash
-# 1. Go into the project folder
-cd audio-finder
-
-# 2. Install Node.js dependencies
-npm install
-
-# 3. Start the server
-npm start
-
-# 4. Open your browser at:
-# http://localhost:3000
-```
-
-For development with auto-reload:
-```bash
-npm run dev
-```
-
----
-
-## 🧪 How to Use
-
-1. Open `http://localhost:3000`
-2. Paste a YouTube URL into the input field
-3. Click **Extract** (or press Enter)
-4. Audio starts playing almost instantly — no waiting for full download!
-5. Click **Download** to save the audio file
-
----
-
-## 🔒 Features
-
-- ✅ No FFmpeg required — pure Node.js
-- ✅ True audio streaming — plays while it loads
-- ✅ YouTube URL validation before hitting the server
-- ✅ Rate limiting: max 10 requests per IP per 15 minutes
-- ✅ No temp files — nothing written to disk
-- ✅ User-friendly error messages
-
----
-
-## ⚠️ Notes
-
-- Only **YouTube links** are supported currently
-- Audio is served in **WebM/Opus** format (natively supported by Chrome, Firefox, Edge)
-- For personal/educational use only — respect copyright laws
-/
+For personal and educational use only. Respect copyright laws.
