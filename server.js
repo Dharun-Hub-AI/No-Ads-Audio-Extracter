@@ -26,6 +26,13 @@ const AUDIO_FORMATS = {
   flac: { ext: "flac", codec: "flac",       mime: "audio/flac",  bitrate: false },
 };
 
+const YTDLP_OPTS = {
+  noWarnings: true,
+  noCheckCertificates: true,
+  userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+  extractorArgs: ["youtube:player_client=ios,web"],
+};
+
 function isValidUrl(str) {
   try { const u = new URL(str); return u.protocol === "http:" || u.protocol === "https:"; }
   catch { return false; }
@@ -36,7 +43,7 @@ app.get("/info", async (req, res) => {
   if (!url || !isValidUrl(url))
     return res.status(400).json({ error: "Please provide a valid URL." });
   try {
-    const info = await ytDlp(url, { dumpSingleJson: true, noWarnings: true, noCheckCertificates: true });
+    const info = await ytDlp(url, { ...YTDLP_OPTS, dumpSingleJson: true });
     const thumb = info.thumbnail || `https://img.youtube.com/vi/${info.id || ""}/maxresdefault.jpg`;
     res.json({ title: info.title || "Media", thumbnail: thumb, duration: info.duration || 0 });
   } catch (err) {
@@ -62,10 +69,9 @@ app.get("/extract", async (req, res) => {
 
   try {
     await ytDlp(url, {
+      ...YTDLP_OPTS,
       output: rawPath,
       format: "bestaudio[ext=m4a]/bestaudio[ext=webm]/bestaudio/best",
-      noWarnings: true,
-      noCheckCertificates: true,
     });
     let command = ffmpeg(rawPath).audioCodec(fmtConfig.codec);
     if (fmtConfig.bitrate) command = command.audioBitrate(br);
