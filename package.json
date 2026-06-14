@@ -5,6 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
+    "postinstall": "node -e \"require('yt-dlp-exec')\"",
     "dev": "nodemon server.js"
   },
   "dependencies": {
