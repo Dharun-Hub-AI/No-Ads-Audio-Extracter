@@ -52,7 +52,7 @@ const BASE_ARGS = [
   "--no-warnings",
   "--no-check-certificates",
   "--user-agent", UA,
-  "--extractor-args", "youtube:player_client=ios,web",
+  "--extractor-args", "youtube:player_client=web_creator,ios,web",
 ];
 
 app.get("/info", async (req, res) => {
@@ -67,8 +67,8 @@ app.get("/info", async (req, res) => {
   } catch (err) {
     const msg = (err.stderr || err.message || "").toLowerCase();
     if (msg.includes("private"))   return res.status(400).json({ error: "This video is private." });
-    if (msg.includes("age"))       return res.status(400).json({ error: "This video has age restrictions." });
-    if (msg.includes("available")) return res.status(400).json({ error: "This video is unavailable." });
+    if (msg.includes("confirm you") || msg.includes("sign in")) return res.status(400).json({ error: "This video requires sign-in (age-restricted)." });
+    if (msg.includes("not available") || msg.includes("unavailable")) return res.status(400).json({ error: "This video is unavailable." });
     res.status(500).json({ error: "Could not fetch video info." });
   }
 });
@@ -117,8 +117,8 @@ app.get("/extract", async (req, res) => {
       console.error("Extraction error:", err.stderr || err.message);
       const msg = (err.stderr || err.message || "").toLowerCase();
       if (msg.includes("private"))   return res.status(400).json({ error: "This video is private." });
-      if (msg.includes("age"))       return res.status(400).json({ error: "Age-restricted video." });
-      if (msg.includes("available")) return res.status(400).json({ error: "Video unavailable or removed." });
+      if (msg.includes("confirm you") || msg.includes("sign in")) return res.status(400).json({ error: "This video requires sign-in (age-restricted)." });
+      if (msg.includes("not available") || msg.includes("unavailable")) return res.status(400).json({ error: "Video unavailable or removed." });
       return res.status(500).json({ error: "Could not extract. Please try again." });
     }
   }
