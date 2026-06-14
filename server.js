@@ -8,7 +8,7 @@ const { randomUUID } = require("crypto");
 
 ffmpeg.setFfmpegPath(ffmpegPath);
 
-const YTDLP_PATH = require("./node_modules/yt-dlp-exec/src/constants").YOUTUBE_DL_PATH;
+const YTDLP_PATH = path.join(__dirname, "node_modules", "yt-dlp-exec", "bin", "yt-dlp");
 console.log("[yt-dlp] Binary:", YTDLP_PATH, "Exists:", fs.existsSync(YTDLP_PATH));
 
 const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";

@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "postinstall": "node -e \"require('yt-dlp-exec')('https://www.youtube.com/watch?v=dQw4w9WgXcQ',{dumpSingleJson:true,noWarnings:true}).catch(()=>{})\"",
+    "build": "curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o node_modules/yt-dlp-exec/bin/yt-dlp && chmod +x node_modules/yt-dlp-exec/bin/yt-dlp || true",
+    "postinstall": "node -e \"try{require('yt-dlp-exec')}catch(e){}\"",
     "dev": "nodemon server.js"
   },
   "dependencies": {
