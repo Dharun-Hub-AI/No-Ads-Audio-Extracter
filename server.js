@@ -1,5 +1,5 @@
 const express = require("express");
-const ytDlp = require("yt-dlp-exec");
+const { execFile } = require("child_process");
 const ffmpeg = require("fluent-ffmpeg");
 const ffmpegPath = require("ffmpeg-static");
 const path = require("path");
@@ -7,6 +7,23 @@ const fs = require("fs");
 const { randomUUID } = require("crypto");
 
 ffmpeg.setFfmpegPath(ffmpegPath);
+
+const YTDLP_PATH = require("./node_modules/yt-dlp-exec/src/constants").YOUTUBE_DL_PATH;
+console.log("[yt-dlp] Binary:", YTDLP_PATH, "Exists:", fs.existsSync(YTDLP_PATH));
+
+const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
+
+function runYtDlp(args) {
+  return new Promise((resolve, reject) => {
+    execFile(YTDLP_PATH, args, { timeout: 300000 }, (err, stdout, stderr) => {
+      if (err) {
+        console.error("[yt-dlp] Error:", stderr || err.message);
+        return reject(err);
+      }
+      resolve(stdout);
+    });
+  });
+}
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -26,26 +43,27 @@ const AUDIO_FORMATS = {
   flac: { ext: "flac", codec: "flac",       mime: "audio/flac",  bitrate: false },
 };
 
-const YTDLP_OPTS = {
-  noWarnings: true,
-  noCheckCertificates: true,
-  userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
-  extractorArgs: "youtube:player_client=ios,web",
-};
-
 function isValidUrl(str) {
   try { const u = new URL(str); return u.protocol === "http:" || u.protocol === "https:"; }
   catch { return false; }
 }
+
+const BASE_ARGS = [
+  "--no-warnings",
+  "--no-check-certificates",
+  "--user-agent", UA,
+  "--extractor-args", "youtube:player_client=ios,web",
+];
 
 app.get("/info", async (req, res) => {
   const { url } = req.query;
   if (!url || !isValidUrl(url))
     return res.status(400).json({ error: "Please provide a valid URL." });
   try {
-    const info = await ytDlp(url, { ...YTDLP_OPTS, dumpSingleJson: true });
-    const thumb = info.thumbnail || `https://img.youtube.com/vi/${info.id || ""}/maxresdefault.jpg`;
-    res.json({ title: info.title || "Media", thumbnail: thumb, duration: info.duration || 0 });
+    const info = await runYtDlp([...BASE_ARGS, "--dump-single-json", url]);
+    const parsed = JSON.parse(info);
+    const thumb = parsed.thumbnail || `https://img.youtube.com/vi/${parsed.id || ""}/maxresdefault.jpg`;
+    res.json({ title: parsed.title || "Media", thumbnail: thumb, duration: parsed.duration || 0 });
   } catch (err) {
     const msg = (err.stderr || err.message || "").toLowerCase();
     if (msg.includes("private"))   return res.status(400).json({ error: "This video is private." });
@@ -68,11 +86,12 @@ app.get("/extract", async (req, res) => {
   const outPath = path.join(TMP_DIR, `${id}.${fmtConfig.ext}`);
 
   try {
-    await ytDlp(url, {
-      ...YTDLP_OPTS,
-      output: rawPath,
-      format: "bestaudio[ext=m4a]/bestaudio[ext=webm]/bestaudio/best",
-    });
+    await runYtDlp([
+      ...BASE_ARGS,
+      "-o", rawPath,
+      "-f", "bestaudio[ext=m4a]/bestaudio[ext=webm]/bestaudio/best",
+      url,
+    ]);
     let command = ffmpeg(rawPath).audioCodec(fmtConfig.codec);
     if (fmtConfig.bitrate) command = command.audioBitrate(br);
     await new Promise((resolve, reject) => {
